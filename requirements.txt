@@ -1,0 +1,45 @@
+# UI
+streamlit
+
+# YouTube / video downloading
+yt-dlp
+
+# Audio processing
+pydub
+ffmpeg-python
+
+# Local Whisper
+openai-whisper
+
+# LangChain / LCEL
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
+langchain-chroma
+langchain-huggingface
+
+# Gemini
+google-generativeai
+
+# RAG / Vector Database
+chromadb
+sentence-transformers
+
+# HuggingFace
+transformers
+huggingface-hub
+
+# ML / numerical
+torch
+numpy
+scikit-learn
+
+# PDF / TXT export
+reportlab
+
+# Environment variables
+python-dotenv
+
+# Data processing
+pandas
