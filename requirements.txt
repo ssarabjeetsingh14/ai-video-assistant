@@ -4,6 +4,7 @@ streamlit
 # YouTube / video downloading
 
 yt-dlp
+yt-dlp-ejs
 
 # Audio processing
 pydub
