@@ -1,34 +1,53 @@
 import yt_dlp
 from pydub import AudioSegment
 import os
+import tempfile
+from pathlib import Path
 
-DOWNLOAD_DIR = 'downloads'
-os.makedirs(DOWNLOAD_DIR,exist_ok = True)
 
-def download_youtube_audio(url :str) ->str:
-    output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
+def download_youtube_audio(url: str) -> str:
+    temp_dir = tempfile.mkdtemp(prefix="audio_")
+    output_template = os.path.join(temp_dir, "audio.%(ext)s")
+
     ydl_opts = {
         "format": "bestaudio/best",
+        "outtmpl": output_template,
         "noplaylist": True,
         "retries": 3,
         "fragment_retries": 3,
         "extractor_retries": 3,
         "socket_timeout": 30,
         "cachedir": False,
-        "outtmpl": output_path,
+        "verbose": True,
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "wav",
-                "preferredquality": "192",
             }
         ],
-        "quiet": True,
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
-    return filename
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+
+        wav_path = os.path.join(temp_dir, f"{info['id']}.wav")
+
+        if not os.path.exists(wav_path):
+            # Some yt-dlp versions may choose a different filename.
+            wav_files = list(Path(temp_dir).glob("*.wav"))
+            if not wav_files:
+                raise FileNotFoundError(
+                    "yt-dlp finished without producing a WAV file."
+                )
+            wav_path = str(wav_files[0])
+
+        return wav_path
+
+    except Exception as exc:
+        raise RuntimeError(
+            f"YouTube download failed: {type(exc).__name__}: {exc}"
+        ) from exc
 
 
 def convert_to_wav(input_path: str) -> str:
